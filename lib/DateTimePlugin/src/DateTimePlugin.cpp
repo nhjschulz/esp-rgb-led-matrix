@@ -400,7 +400,14 @@ void DateTimePlugin::updateDateTime(bool force)
             /* Should never happen. */
             m_mode = MODE_DATE_TIME;
             break;
-        };
+        }
+
+        /* cache time every second in view  (i.e. for analog clock) */
+        if ((true == force) ||
+            (m_shownSecond != timeInfo.tm_sec))
+        {
+            m_view.setCurrentTime(timeInfo);
+        }
 
         if (true == showTime)
         {

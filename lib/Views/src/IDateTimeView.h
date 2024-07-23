@@ -149,7 +149,14 @@ public:
      *
      * @param[in] timeInfo the current time info.
      */
-    virtual void setWeekdayIndicator(tm timeInfo) = 0;
+    virtual void setWeekdayIndicator(const tm& timeInfo) = 0;
+
+    /**
+     * @brief Update current time values in view
+     * 
+     * @param now current time
+     */
+    virtual void setCurrentTime(const tm& now) = 0;
 
 protected:
 

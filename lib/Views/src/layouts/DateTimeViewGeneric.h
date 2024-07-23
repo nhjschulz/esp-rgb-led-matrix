@@ -79,7 +79,8 @@ public:
                       {LAMP_WIDTH, LAMP_HEIGHT, LAMP_5_X , LAMP_Y},
                       {LAMP_WIDTH, LAMP_HEIGHT, LAMP_6_X , LAMP_Y}},
         m_dayOnColor(DAY_ON_COLOR),
-        m_dayOffColor(DAY_OFF_COLOR)
+        m_dayOffColor(DAY_OFF_COLOR),
+        m_now()
     {
     }
 
@@ -220,7 +221,17 @@ public:
      *
      * @param[in] timeInfo the current time info.
      */
-    void setWeekdayIndicator(tm timeInfo) override;
+    void setWeekdayIndicator(const tm& timeInfo) override;
+
+    /**
+     * @brief Update current time values in view
+     * 
+     * @param now current time
+     */
+    virtual void setCurrentTime(const tm& now)
+    {
+        m_now = now;
+    }
 
     /** Max. number of lamps. One lamp per day in a week. */
     static const uint8_t    MAX_LAMPS       = 7U;
@@ -294,6 +305,7 @@ protected:
     LampWidget      m_lampWidgets[MAX_LAMPS];   /**< Lamp widgets, used to signal the day of week. */
     Color           m_dayOnColor;               /**< Color of current day in the day of the week bar. */
     Color           m_dayOffColor;              /**< Color of the other days in the day of the week bar. */
+    tm              m_now;                      /**< Latest time update */
 
     DateTimeViewGeneric(const DateTimeViewGeneric& other);
     DateTimeViewGeneric& operator=(const DateTimeViewGeneric& other);

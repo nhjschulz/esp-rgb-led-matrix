@@ -220,7 +220,7 @@ public:
      *
      * @param[in] timeInfo the current time info.
      */
-    void setWeekdayIndicator(tm timeInfo) override;
+    void setWeekdayIndicator(const tm& timeInfo) override;
 
     /** Max. number of lamps. One lamp per day in a week. */
     static const uint8_t    MAX_LAMPS       = 7U;
