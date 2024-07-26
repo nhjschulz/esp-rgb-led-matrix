@@ -69,7 +69,15 @@ public:
      * Construct the view.
      */
     DateTimeView64x64() : DateTimeViewGeneric()
-    { 
+    {
+        m_textWidget.disableFadeEffect();
+
+        /*
+         * Move digital clock to lower paet of analog clock.
+         * Analog clock is also shifted in X by one as the 
+         * mid point is 31.5
+         */
+        m_textWidget.move(1, 46); 
     }
 
     /**

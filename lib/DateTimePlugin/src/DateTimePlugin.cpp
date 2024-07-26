@@ -426,9 +426,7 @@ void DateTimePlugin::updateDateTime(bool force)
                     m_view.setFormatText(timeAsStr);
 
                     m_shownSecond = timeInfo.tm_sec;
-                }
-                
-                m_view.setWeekdayIndicator(timeInfo);
+                } 
             }
         }
         else if (true == showDate)
@@ -448,9 +446,7 @@ void DateTimePlugin::updateDateTime(bool force)
                     m_view.setFormatText(dateAsStr);
 
                     m_shownDayOfTheYear = timeInfo.tm_yday;
-                }
-                
-                m_view.setWeekdayIndicator(timeInfo);
+                }              
             }
         }
         else

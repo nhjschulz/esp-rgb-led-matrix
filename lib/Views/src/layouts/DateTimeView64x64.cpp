@@ -91,23 +91,17 @@ static const float MINUTE_SINUS_TABLE[16u] = {
  */
 void DateTimeView64x64::update(YAGfx& gfx)
 {
-    uint8_t idx = 0U;
+    DateTimeViewGeneric::update(gfx);
 
-    gfx.fillScreen(ColorDef::BLACK);
-    m_textWidget.update(gfx);
-
-    while (MAX_LAMPS > idx)
-    {
-        m_lampWidgets[idx].update(gfx);
-
-        ++idx;
-    }
-
+    /* Draw analog clock minute circle*/
     drawAnalogClockBackground(gfx);
-    drawAnalogClockHand(gfx, m_now.tm_min, ANALOG_RADIUS - 5, ColorDef::GRAY);
-    drawAnalogClockHand(gfx, m_now.tm_hour * 5, ANALOG_RADIUS - 11, ColorDef::GRAY);
+
+    /* Draw analog clck hands. */
+    drawAnalogClockHand(gfx, m_now.tm_hour * 5 + m_now.tm_min / 12 , ANALOG_RADIUS - 12, ColorDef::GRAY);
+    drawAnalogClockHand(gfx, m_now.tm_min, ANALOG_RADIUS - 6, ColorDef::GRAY);
     drawAnalogClockHand(gfx, m_now.tm_sec, ANALOG_RADIUS - 1, ColorDef::YELLOW);
-     /* Draw hand center */
+    
+    /* Draw analog clock hand center */
     gfx.drawRectangle(ANALOG_CENTER_X - 2, ANALOG_CENTER_Y - 2, 5, 5, ColorDef::YELLOW);
     gfx.drawPixel(ANALOG_CENTER_X, ANALOG_CENTER_Y, ColorDef::BLACK);
     gfx.drawPixel(ANALOG_CENTER_X-2, ANALOG_CENTER_Y-2, ColorDef::BLACK);

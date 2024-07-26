@@ -217,21 +217,11 @@ public:
     }
 
     /**
-     * Set weekday indicator depended on the given time info.
-     *
-     * @param[in] timeInfo the current time info.
-     */
-    void setWeekdayIndicator(const tm& timeInfo) override;
-
-    /**
      * @brief Update current time values in view
      * 
      * @param now current time
      */
-    virtual void setCurrentTime(const tm& now)
-    {
-        m_now = now;
-    }
+    virtual void setCurrentTime(const tm& now) override;
 
     /** Max. number of lamps. One lamp per day in a week. */
     static const uint8_t    MAX_LAMPS       = 7U;

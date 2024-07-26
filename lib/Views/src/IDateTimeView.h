@@ -145,13 +145,6 @@ public:
     virtual void setDayOffColor(const Color& color) = 0;
 
     /**
-     * Set weekday indicator depended on the given time info.
-     *
-     * @param[in] timeInfo the current time info.
-     */
-    virtual void setWeekdayIndicator(const tm& timeInfo) = 0;
-
-    /**
      * @brief Update current time values in view
      * 
      * @param now current time
