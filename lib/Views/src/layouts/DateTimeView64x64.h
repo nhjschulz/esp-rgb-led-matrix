@@ -118,22 +118,6 @@ protected:
     DateTimeView64x64& operator=(const DateTimeView64x64& other);
 
     /**
-     * @brief Get the Minute Sinus value
-     * 
-     * @param angle Minute angle, must be mutliple of 6°  (360 °/ 60 minutes)
-     * @return sinus value for angle 
-     */
-    static float getMinuteSinus(uint16_t angle);
-
-    /**
-     * @brief Get the Minute Cosinus value
-     * 
-     * @param angle Minute angle, must be mutliple of 6° (360 °/ 60 minutes)
-     * @return sinus value for angle 
-     */
-    static float getMinuteCosinus(uint16_t angle);
-
-    /**
      * Draw analog clock backround (the minute tick marks)
      * 
      * @param[in] gfx   Graphic functionality to draw on the underlying canvas.
