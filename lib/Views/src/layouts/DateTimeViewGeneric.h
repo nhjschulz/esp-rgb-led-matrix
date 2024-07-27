@@ -82,6 +82,10 @@ public:
         m_dayOffColor(DAY_OFF_COLOR),
         m_now()
     {
+        /* Disable fade effect in case the user required to show seconds,
+         * which will continuously trigger the fading effect.
+         */
+        m_textWidget.disableFadeEffect();
     }
 
     /**

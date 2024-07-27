@@ -70,6 +70,9 @@ public:
      */
     DateTimeView64x64() : DateTimeViewGeneric()
     {
+        /* Disable fade effect in case the user required to show seconds,
+         * which will continuously trigger the fading effect.
+         */
         m_textWidget.disableFadeEffect();
 
         /*
