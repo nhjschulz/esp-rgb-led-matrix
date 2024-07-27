@@ -26,7 +26,7 @@
 *******************************************************************************/
 /**
  * @brief  View for 64x64 LED matrix with date and time.
- * 
+ *
  * @author Andreas Merkle <web@blue-andi.de>
  * @author Norbert Schulz <github@schulznorbert.de>
  */
@@ -57,7 +57,7 @@ static const int16_t SINUS_VAL_SCALE = 10000;
 
 /**
 * @brief Get the Minute Sinus value
-* 
+*
 * @param angle Minute angle, must be mutliple of 6°  (360 °/ 60 minutes)
 * @return sinus value for angle (scaled by 10.000)
 */
@@ -65,7 +65,7 @@ static int16_t getMinuteSinus(uint16_t angle);
 
 /**
  * @brief Get the Minute Cosinus value
- * 
+ *
  * @param angle Minute angle, must be mutliple of 6° (360 °/ 60 minutes)
  * @return cosinus value for angle (scaled by 10.000)
  */
@@ -75,13 +75,13 @@ static int16_t getMinuteCosinus(uint16_t angle);
  * Local Variables
  *****************************************************************************/
 
-/** 
+/**
   * Sinus lookup table for analog clock drawing
-  * 
+  *
   * Holds sinus values for the minutes 0 .. 15 angles in quadarant 0.
-  * Other quadrants and cosinus values get derived from these values 
+  * Other quadrants and cosinus values get derived from these values
   * to avoid recalculations.
-  * 
+  *
   * Sinus value are stored as integer scaled by 10.000.
   */
 static const uint16_t MINUTE_SIN_TAB[16u] = {
@@ -114,8 +114,17 @@ static const uint16_t MINUTE_SIN_TAB[16u] = {
  */
 void DateTimeView64x64::update(YAGfx& gfx)
 {
-    DateTimeViewGeneric::update(gfx);
+    uint8_t idx = 0U;
 
+    gfx.fillScreen(ColorDef::BLACK);
+
+    m_textWidget.update(gfx);
+    while(MAX_LAMPS > idx)
+    {
+        m_lampWidgets[idx].update(gfx);
+
+        ++idx;
+    }
     /* Draw analog clock minute circle*/
     drawAnalogClockBackground(gfx);
 
@@ -123,7 +132,7 @@ void DateTimeView64x64::update(YAGfx& gfx)
     drawAnalogClockHand(gfx, m_now.tm_hour * 5 + m_now.tm_min / 12 , ANALOG_RADIUS - 12, ColorDef::GRAY);
     drawAnalogClockHand(gfx, m_now.tm_min, ANALOG_RADIUS - 6, ColorDef::GRAY);
     drawAnalogClockHand(gfx, m_now.tm_sec, ANALOG_RADIUS - 1, ColorDef::YELLOW);
-    
+
     /* Draw analog clock hand center */
     gfx.drawRectangle(ANALOG_CENTER_X - 2, ANALOG_CENTER_Y - 2, 5, 5, ColorDef::YELLOW);
     gfx.drawPixel(ANALOG_CENTER_X, ANALOG_CENTER_Y, ColorDef::BLACK);
@@ -131,6 +140,11 @@ void DateTimeView64x64::update(YAGfx& gfx)
     gfx.drawPixel(ANALOG_CENTER_X-2, ANALOG_CENTER_Y+2, ColorDef::BLACK);
     gfx.drawPixel(ANALOG_CENTER_X+2, ANALOG_CENTER_Y-2, ColorDef::BLACK);
     gfx.drawPixel(ANALOG_CENTER_X+2, ANALOG_CENTER_Y+2, ColorDef::BLACK);
+
+    //int16_t x, y;
+    //m_textWidget.getPos(x, y);
+    //gfx.fillRect(x, y, m_textWidget.getWidth(), m_textWidget.getHeight(), ColorDef::RED);
+    //m_textWidget.update(gfx);
 }
 
 /******************************************************************************
@@ -144,8 +158,9 @@ void DateTimeView64x64::update(YAGfx& gfx)
 void DateTimeView64x64::drawAnalogClockBackground(YAGfx& gfx)
 {
     /* draw minute ring */
+    uint16_t secondAngle(270u + m_now.tm_sec * 6u);
 
-    for (uint16_t angle = 0u; angle < 360u; angle += 6u)
+    for (uint16_t angle = 270u; angle < (270u + 360u); angle += 6u)
     {
         int16_t dx(getMinuteCosinus(angle));
         int16_t dy(getMinuteSinus(angle));
@@ -162,7 +177,9 @@ void DateTimeView64x64::drawAnalogClockBackground(YAGfx& gfx)
         }
         else
         {
-            gfx.drawPixel(xs, ys, ColorDef::DARKGRAY);
+            /* Draw minute tick marks with passed seconds highlighting. */
+            Color tickMarkCol((angle <= secondAngle) ? ColorDef::YELLOW : ColorDef::DARKGRAY);
+            gfx.drawPixel(xs, ys, tickMarkCol);
         }
     }
 }
@@ -194,14 +211,13 @@ void DateTimeView64x64::drawAnalogClockHand(YAGfx& gfx, int16_t minute, int16_t 
 
 static int16_t getMinuteSinus(uint16_t angle)
 {
-    int16_t sinus(0);
+    angle %= 360u;
 
-    angle %= 360u; 
-
-    /* 
-     * Lookup table only stores 1st quadrant sinus values. 
+    /*
+     * Lookup table only stores 1st quadrant sinus values.
      * Others are calculated based on sinus curve symetries.
      */
+    int16_t sinus(0);
     if (90u >= angle)  /* quadrant 1 */
     {
         sinus = MINUTE_SIN_TAB[angle / 6u];
