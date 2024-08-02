@@ -2,8 +2,10 @@
 UseTab: Never
 IndentWidth: 4
 ColumnLimit: 0
-BreakBeforeBraces: Allman
 SortIncludes: Never
+
+PointerAlignment: Left
+ReferenceAlignment: Left
 
 # spaces
 SpaceBeforeParens: Custom
@@ -31,6 +33,22 @@ AlignConsecutiveAssignments:
 
 # wrapping/combining
 AllowShortFunctionsOnASingleLine: None
+BreakBeforeBraces: Custom
+BraceWrapping:
+  IndentBraces:    False
+  AfterClass:      true
+  AfterControlStatement: true
+  AfterEnum:       True
+  AfterFunction:   true
+  AfterNamespace:  True
+  AfterObjCDeclaration: True
+  AfterStruct:     True
+  AfterUnion:      True
+  BeforeCatch:     True
+  BeforeElse:      True
+  BeforeWhile:     True
+  SplitEmptyFunction: true
+  SplitEmptyRecord: true
 
 # C++ Constructor settings
 BreakConstructorInitializers: AfterColon
