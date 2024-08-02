@@ -16,3 +16,6 @@ BreakConstructorInitializers: AfterColon
 PackConstructorInitializers: Never
 ConstructorInitializerIndentWidth: 4
 ContinuationIndentWidth: 4
+
+# templates
+SpacesInAngles: Leave  # Don't change
