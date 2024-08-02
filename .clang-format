@@ -1,4 +1,12 @@
+# basics
 UseTab: Never
 IndentWidth: 4
+ColumnLimit: 100
 BreakBeforeBraces: Allman
 SortIncludes: Never
+
+# C++ Constructor settings
+BreakConstructorInitializers: AfterColon
+PackConstructorInitializers: Never
+ConstructorInitializerIndentWidth: 4
+ContinuationIndentWidth: 4
