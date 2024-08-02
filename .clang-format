@@ -11,6 +11,8 @@ SpaceBeforeParensOptions:
   AfterControlStatements: true   # ISSUE: only global for if/while/for/switch but don't want only for if 
   AfterFunctionDefinitionName: false
 
+AllowShortFunctionsOnASingleLine: None
+
 # C++ Constructor settings
 BreakConstructorInitializers: AfterColon
 PackConstructorInitializers: Never
