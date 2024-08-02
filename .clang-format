@@ -5,6 +5,12 @@ ColumnLimit: 100
 BreakBeforeBraces: Allman
 SortIncludes: Never
 
+# spaces
+SpaceBeforeParens: Custom
+SpaceBeforeParensOptions:
+  AfterControlStatements: true   # ISSUE: only global for if/while/for/switch but don't want only for if 
+  AfterFunctionDefinitionName: false
+
 # C++ Constructor settings
 BreakConstructorInitializers: AfterColon
 PackConstructorInitializers: Never
