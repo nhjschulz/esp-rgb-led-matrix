@@ -7,6 +7,8 @@ SortIncludes: Never
 PointerAlignment: Left
 ReferenceAlignment: Left
 
+AlignAfterOpenBracket: DontAlign # Argument aligned by level not function name ISSUE: ");" is not on a new line
+
 # spaces
 SpaceBeforeParens: Custom
 SpaceBeforeParensOptions:
@@ -30,6 +32,9 @@ AlignConsecutiveAssignments:
   AcrossComments: true
   AlignCompound: true
   PadOperators: true
+
+BinPackArguments: false
+BinPackParameters: false
 
 # wrapping/combining
 AllowShortFunctionsOnASingleLine: None
