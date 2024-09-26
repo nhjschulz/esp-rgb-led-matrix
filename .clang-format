@@ -65,3 +65,5 @@ ContinuationIndentWidth: 4
 IndentAccessModifiers: false
 AccessModifierOffset: -4
 SpacesInAngles: Leave  # Don't change
+
+Cpp11BracedListStyle: false
