@@ -70,6 +70,18 @@ public:
     }
 
     /**
+     * The view modes, which influences how the data is
+     * shown on the display.
+     */
+    enum ViewMode
+    {
+        DIGITAL_ONLY = 0U,       /**< Show date and time */
+        ANALOG_ONLY,             /**< Show only the date */
+        DIGITAL_AND_ANALOG,      /**< Show only the time */
+        VIEW_MODE_MAX            /**< Number of configurations */
+    };
+
+    /**
      * Initialize view, which will prepare the widgets and the default values.
      */
     virtual void init(uint16_t width, uint16_t height) = 0;
@@ -159,6 +171,20 @@ public:
      * @param[in] color Color for the other days
      */
     virtual void setDayOffColor(const Color& color) = 0;
+
+    /**
+     * Get the view mode (analog, digital or both).
+     * 
+     * @return ViewMode 
+     */
+    virtual ViewMode getViewMode() const = 0;
+
+    /**
+     * Set the view mode (analog, digital or both).
+     * 
+     * @return bool success of failure 
+     */
+    virtual bool setViewMode(ViewMode mode) = 0;
 
     /**
      * @brief Update current time values in view.

@@ -250,6 +250,31 @@ public:
     }
 
     /**
+     * Get the view mode (analog, digital or both).
+     * 
+     * @return ViewMode 
+     */
+    ViewMode getViewMode() const override
+    {
+        return ViewMode::DIGITAL_ONLY;  /* 32X8 layout can only do digital.*/
+    }
+
+    /**
+     * Set the view mode (analog, digital or both).
+     * 
+     * @return ViewMode 
+     */
+    bool setViewMode(ViewMode mode) override
+    {
+        if (ViewMode::DIGITAL_ONLY != mode)
+        {
+            LOG_WARNING("Illegal DateTime view mode for 32X8: (%hhu)", mode);
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * @brief Update current time values in view.
      * 
      * @param[in] now current time

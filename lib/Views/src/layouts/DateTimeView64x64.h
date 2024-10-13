@@ -70,6 +70,7 @@ public:
      */
     DateTimeView64x64() :
         DateTimeViewGeneric(),
+        m_mode(ViewMode::DIGITAL_AND_ANALOG),
         m_secondsDisplayMode(SECOND_DISP_RING),
         m_lastUpdateSecondVal(-1)
     {
@@ -101,7 +102,34 @@ public:
     void update(YAGfx& gfx) override;
 
 
+        /**
+     * Get the view mode (analog, digital or both).
+     * 
+     * @return ViewMode 
+     */
+    ViewMode getViewMode() const override
+    {
+        return m_mode;
+    }
 
+    /**
+     * Set the view mode (analog, digital or both).
+     * 
+     * @return ViewMode 
+     */
+    bool setViewMode(ViewMode mode) override
+    {
+        if (ViewMode::VIEW_MODE_MAX <= mode)
+        {
+            LOG_WARNING("Illegal DateTime view mode (%hhu)", mode);
+            return false;
+        }
+
+        LOG_WARNING("new view mode (%hhu)", mode);
+
+        m_mode = mode;
+        return true;
+    }
 protected:
 
     /** Options for displaying seconds in analog clock
@@ -114,6 +142,7 @@ protected:
         SECOND_DISP_BOTH = 3U, /**< Show hand and on ring. */
     };
 
+    ViewMode           m_mode;               /**< Used View mode analog, digital or both.  */
     SecondsDisplayMode m_secondsDisplayMode; /**< How to visualize seconds in analog clock. */
 
 
