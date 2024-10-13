@@ -121,34 +121,38 @@ void DateTimeView64x64::update(YAGfx& gfx)
 
         gfx.fillScreen(ColorDef::BLACK);
 
-        m_textWidget.update(gfx);
-
         for (idx = 0; MAX_LAMPS > idx; ++idx)
         {
             m_lampWidgets[idx].update(gfx);
         }
 
-        /* Draw analog clock minute circle. */
-        drawAnalogClockBackground(gfx);
-
-        /* Draw analog clock hands. */
-        drawAnalogClockHand(gfx, m_now.tm_min, ANALOG_RADIUS - 6, ColorDef::GRAY);
-        drawAnalogClockHand(gfx, m_now.tm_hour * 5 + m_now.tm_min / 12 , ANALOG_RADIUS - 13, ColorDef::WHITE);
-
-        if (0U != (m_secondsDisplayMode & SECOND_DISP_HAND))
+        if ((ViewMode::DIGITAL_AND_ANALOG == m_mode) || (ViewMode::ANALOG_ONLY == m_mode))
         {
-            drawAnalogClockHand(gfx, m_now.tm_sec, ANALOG_RADIUS - 1, ColorDef::YELLOW);
+            /* Draw analog clock minute circle. */
+            drawAnalogClockBackground(gfx);
+    
+            /* Draw analog clock hands. */
+            drawAnalogClockHand(gfx, m_now.tm_min, ANALOG_RADIUS - 6, ColorDef::GRAY);
+            drawAnalogClockHand(gfx, m_now.tm_hour * 5 + m_now.tm_min / 12 , ANALOG_RADIUS - 13, ColorDef::WHITE);
+    
+            if (0U != (m_secondsDisplayMode & SECOND_DISP_HAND))
+            {
+                drawAnalogClockHand(gfx, m_now.tm_sec, ANALOG_RADIUS - 1, ColorDef::YELLOW);
+            }
+    
+            /* Draw analog clock hand center */
+            gfx.drawRectangle(ANALOG_CENTER_X - 2, ANALOG_CENTER_Y - 2, 5, 5, ColorDef::YELLOW);
+            gfx.drawPixel(ANALOG_CENTER_X, ANALOG_CENTER_Y, ColorDef::BLACK);
+            gfx.drawPixel(ANALOG_CENTER_X-2, ANALOG_CENTER_Y-2, ColorDef::BLACK);
+            gfx.drawPixel(ANALOG_CENTER_X-2, ANALOG_CENTER_Y+2, ColorDef::BLACK);
+            gfx.drawPixel(ANALOG_CENTER_X+2, ANALOG_CENTER_Y-2, ColorDef::BLACK);
+            gfx.drawPixel(ANALOG_CENTER_X+2, ANALOG_CENTER_Y+2, ColorDef::BLACK);
         }
 
-        /* Draw analog clock hand center */
-        gfx.drawRectangle(ANALOG_CENTER_X - 2, ANALOG_CENTER_Y - 2, 5, 5, ColorDef::YELLOW);
-        gfx.drawPixel(ANALOG_CENTER_X, ANALOG_CENTER_Y, ColorDef::BLACK);
-        gfx.drawPixel(ANALOG_CENTER_X-2, ANALOG_CENTER_Y-2, ColorDef::BLACK);
-        gfx.drawPixel(ANALOG_CENTER_X-2, ANALOG_CENTER_Y+2, ColorDef::BLACK);
-        gfx.drawPixel(ANALOG_CENTER_X+2, ANALOG_CENTER_Y-2, ColorDef::BLACK);
-        gfx.drawPixel(ANALOG_CENTER_X+2, ANALOG_CENTER_Y+2, ColorDef::BLACK);
-
-        m_textWidget.update(gfx);
+        if ((ViewMode::DIGITAL_AND_ANALOG == m_mode) || (ViewMode::DIGITAL_ONLY == m_mode))
+        {
+            m_textWidget.update(gfx);
+        }
 
         m_lastUpdateSecondVal = m_now.tm_sec;
     }

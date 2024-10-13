@@ -118,7 +118,18 @@
                         <div class="form-group">
                             <label class="form-label" for="timeFormat">Color of other days:</label>
                             <input class="form-control" type="text" id="dayOffColor" name="dayOffColor" value="" />    
-                        </div>                    
+                        </div>
+                         <div class="container-fluid">
+                            <h1>Norbert</h1>
+                            <div class="form-group">
+                            <label class="form-label" for="viewMode">View mode:</label>
+                            <select class="form-select" id="viewMode">
+                                <option value="0">Digital</option>
+                                <option value="1">Analog</option>
+                                <option value="2">Both</option>
+                            </select>    
+                        </div>
+                        </div> 
                         <input name="submit" type="submit" value="Update"/>
                     </form>
                 </div>
@@ -209,6 +220,8 @@
                     $("#startOfWeek").val(rsp.data.startOfWeek);
                     $("#dayOnColor").val(rsp.data.dayOnColor);
                     $("#dayOffColor").val(rsp.data.dayOffColor);
+                    $("#viewMode").val(rsp.data.viewMode);
+
                 }).catch(function(rsp) {
                     alert("Internal error.");
                 }).finally(function() {
@@ -229,7 +242,8 @@
                         timeZone: $("#timeZone").val(),
                         startOfWeek: $("#startOfWeek").val(),
                         dayOnColor: $("#dayOnColor").val(),
-                        dayOffColor: $("#dayOffColor").val()
+                        dayOffColor: $("#dayOffColor").val(),
+                        viewMode: $("#viewMode").val()
                     }
                 }).then(function(rsp) {
                     alert("Ok.");

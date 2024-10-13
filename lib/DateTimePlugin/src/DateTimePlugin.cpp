@@ -265,6 +265,7 @@ void DateTimePlugin::getConfiguration(JsonObject& jsonCfg) const
     MutexGuard<MutexRecursive> guard(m_mutex);
 
     jsonCfg["mode"]         = m_mode;
+    jsonCfg["viewMode"]     = m_view.getViewMode();
     jsonCfg["timeFormat"]   = m_timeFormat;
     jsonCfg["dateFormat"]   = m_dateFormat;
     jsonCfg["timeZone"]     = m_timeZone;
@@ -277,6 +278,7 @@ bool DateTimePlugin::setConfiguration(const JsonObjectConst& jsonCfg)
 {
     bool             status             = false;
     JsonVariantConst jsonMode           = jsonCfg["mode"];
+    JsonVariantConst jsonViewMode       = jsonCfg["viewMode"];
     JsonVariantConst jsonTimeFormat     = jsonCfg["timeFormat"];
     JsonVariantConst jsonDateFormat     = jsonCfg["dateFormat"];
     JsonVariantConst jsonTimeZone       = jsonCfg["timeZone"];
@@ -284,10 +286,17 @@ bool DateTimePlugin::setConfiguration(const JsonObjectConst& jsonCfg)
     JsonVariantConst jsonDayOnColor     = jsonCfg["dayOnColor"];
     JsonVariantConst jsonDayOffColor    = jsonCfg["dayOffColor"];
 
+LOG_WARNING("JSON view mode %d", jsonMode.as<uint8_t>());
+
     if ((false == jsonMode.is<uint8_t>()) &&
         (MODE_MAX <= jsonMode.as<uint8_t>()))
     {
         LOG_WARNING("JSON mode not found or invalid type.");
+    }
+    else if ((false == jsonViewMode.is<uint8_t>()) &&
+        (IDateTimeView::VIEW_MODE_MAX <= jsonMode.as<uint8_t>()))
+    {
+        LOG_WARNING("JSON view mode not found or invalid type.");
     }
     else if (false == jsonTimeFormat.is<String>())
     {
@@ -325,6 +334,7 @@ bool DateTimePlugin::setConfiguration(const JsonObjectConst& jsonCfg)
         status = m_view.setStartOfWeek(jsonStartOfWeek.as<uint8_t>());
         m_view.setDayOnColor(colorFromHtml(jsonDayOnColor.as<String>()));
         m_view.setDayOffColor(colorFromHtml(jsonDayOffColor.as<String>()));
+        m_view.setViewMode(static_cast<IDateTimeView::ViewMode>(jsonViewMode.as<uint8_t>()));
 
         m_hasTopicChanged = true;
     }
