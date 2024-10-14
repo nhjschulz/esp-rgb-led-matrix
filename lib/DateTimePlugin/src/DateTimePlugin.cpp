@@ -99,6 +99,8 @@ bool DateTimePlugin::setTopic(const String& topic, const JsonObjectConst& value)
         DynamicJsonDocument jsonDoc(JSON_DOC_SIZE);
         JsonObject          jsonCfg                 = jsonDoc.to<JsonObject>();
         JsonVariantConst    jsonMode                = value["mode"];
+        JsonVariantConst    jsonViewMode            = value["viewMode"];
+        JsonVariantConst    jsonSecondsMode         = value["secondsMode"];
         JsonVariantConst    jsonTimeFormat          = value["timeFormat"];
         JsonVariantConst    jsonDateFormat          = value["dateFormat"];
         JsonVariantConst    jsonTimeZone            = value["timeZone"];
@@ -120,6 +122,18 @@ bool DateTimePlugin::setTopic(const String& topic, const JsonObjectConst& value)
         if (false == jsonMode.isNull())
         {
             jsonCfg["mode"] = jsonMode.as<uint8_t>();
+            isSuccessful = true;
+        }
+
+        if (false == jsonViewMode.isNull())
+        {
+            jsonCfg["viewMode"] = jsonViewMode.as<uint8_t>();
+            isSuccessful = true;
+        }
+
+        if (false == jsonSecondsMode.isNull())
+        {
+            jsonCfg["secondsMode"] = jsonSecondsMode.as<uint8_t>();
             isSuccessful = true;
         }
         
@@ -279,6 +293,7 @@ bool DateTimePlugin::setConfiguration(const JsonObjectConst& jsonCfg)
     bool             status             = false;
     JsonVariantConst jsonMode           = jsonCfg["mode"];
     JsonVariantConst jsonViewMode       = jsonCfg["viewMode"];
+    JsonVariantConst jsonSecondsMode    = jsonCfg["secondsMode"];
     JsonVariantConst jsonTimeFormat     = jsonCfg["timeFormat"];
     JsonVariantConst jsonDateFormat     = jsonCfg["dateFormat"];
     JsonVariantConst jsonTimeZone       = jsonCfg["timeZone"];
@@ -294,9 +309,14 @@ LOG_WARNING("JSON view mode %d", jsonMode.as<uint8_t>());
         LOG_WARNING("JSON mode not found or invalid type.");
     }
     else if ((false == jsonViewMode.is<uint8_t>()) &&
-        (IDateTimeView::VIEW_MODE_MAX <= jsonMode.as<uint8_t>()))
+        (IDateTimeView::VIEW_MODE_MAX <= jsonViewMode.as<uint8_t>()))
     {
         LOG_WARNING("JSON view mode not found or invalid type.");
+    }
+    else if ((false == jsonSecondsMode.is<uint8_t>()) &&
+        (IDateTimeView::SECONDS_DISP_MAX <= jsonSecondsMode.as<uint8_t>()))
+    {
+        LOG_WARNING("JSON seconds mode not found or invalid type.");
     }
     else if (false == jsonTimeFormat.is<String>())
     {
@@ -335,7 +355,7 @@ LOG_WARNING("JSON view mode %d", jsonMode.as<uint8_t>());
         m_view.setDayOnColor(colorFromHtml(jsonDayOnColor.as<String>()));
         m_view.setDayOffColor(colorFromHtml(jsonDayOffColor.as<String>()));
         m_view.setViewMode(static_cast<IDateTimeView::ViewMode>(jsonViewMode.as<uint8_t>()));
-
+        m_view.setSecondsDisplayMode(static_cast<IDateTimeView::SecondsDisplayMode>(jsonSecondsMode.as<uint8_t>()));
         m_hasTopicChanged = true;
     }
 

@@ -81,6 +81,18 @@ public:
         VIEW_MODE_MAX            /**< Number of configurations */
     };
 
+    /** 
+     * Options for displaying seconds in analog clock.
+     */
+    enum SecondsDisplayMode
+    {
+        SECOND_DISP_OFF = 0U,  /**< No second indicator display. */
+        SECOND_DISP_HAND = 1U, /**< Draw second clock hand. */
+        SECOND_DISP_RING = 2U, /**< Show passed seconds on minute tick ring. */
+        SECOND_DISP_BOTH = 3U, /**< Show hand and on ring. */
+        SECONDS_DISP_MAX       /**< Number of configurations. */
+    };
+
     /**
      * Initialize view, which will prepare the widgets and the default values.
      */
@@ -185,6 +197,20 @@ public:
      * @return bool success of failure 
      */
     virtual bool setViewMode(ViewMode mode) = 0;
+
+    /**
+     * Get the analog clock seconds display mode (none, ring, hand or both).
+     * 
+     * @return SecondsDisplayMode 
+     */
+    virtual SecondsDisplayMode getSecondsDisplayMode() const = 0;
+
+    /**
+     * Set the analog clock seconds display mode (none, ring, hand or both).
+     * 
+     * @return success or failure
+     */
+    virtual bool setSecondsDisplayMode(SecondsDisplayMode mode) = 0;
 
     /**
      * @brief Update current time values in view.

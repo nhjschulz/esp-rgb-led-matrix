@@ -102,7 +102,7 @@ public:
     void update(YAGfx& gfx) override;
 
 
-        /**
+    /**
      * Get the view mode (analog, digital or both).
      * 
      * @return ViewMode 
@@ -115,7 +115,7 @@ public:
     /**
      * Set the view mode (analog, digital or both).
      * 
-     * @return ViewMode 
+     * @return success or failure
      */
     bool setViewMode(ViewMode mode) override
     {
@@ -130,17 +130,36 @@ public:
         m_mode = mode;
         return true;
     }
-protected:
 
-    /** Options for displaying seconds in analog clock
+    /**
+     * Get the analog clock seconds display mode (none, ring, hand or both).
+     * 
+     * @return SecondsDisplayMode 
      */
-    enum SecondsDisplayMode
+    SecondsDisplayMode getSecondsDisplayMode() const override
     {
-        SECOND_DISP_OFF = 0U,  /**< No second indicator display. */
-        SECOND_DISP_HAND = 1U, /**< Draw second clock hand. */
-        SECOND_DISP_RING = 2U, /**< Show passed seconds on minute tick ring. */
-        SECOND_DISP_BOTH = 3U, /**< Show hand and on ring. */
-    };
+        return m_secondsDisplayMode;
+    }
+
+    /**
+     * Set the analog clock seconds display mode (none, ring, hand or both).
+     * 
+     * @return success of failure
+     */
+    bool setSecondsDisplayMode(SecondsDisplayMode mode) override
+    {
+        if (SecondsDisplayMode::SECONDS_DISP_MAX <= mode)
+        {
+            LOG_WARNING("Illegal Seconds Display mode (%hhu)", mode);
+            return false;
+        }
+
+        LOG_WARNING("new view mode (%hhu)", mode);
+
+        m_secondsDisplayMode = mode;
+        return true;
+    }
+protected:
 
     ViewMode           m_mode;               /**< Used View mode analog, digital or both.  */
     SecondsDisplayMode m_secondsDisplayMode; /**< How to visualize seconds in analog clock. */

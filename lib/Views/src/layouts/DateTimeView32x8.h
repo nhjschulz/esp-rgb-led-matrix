@@ -275,6 +275,31 @@ public:
     }
 
     /**
+     * Get the analog clock seconds display mode (none, ring, hand or both).
+     * 
+     * @return SecondsDisplayMode 
+     */
+    virtual SecondsDisplayMode getSecondsDisplayMode() const override
+    {
+        return SecondsDisplayMode::SECOND_DISP_OFF; /* 32X8 layout can only do digital.*/
+    }
+
+    /**
+     * Set the analog clock seconds display mode (none, ring, hand or both).
+     * 
+     * @return success of failure
+     */
+    virtual bool setSecondsDisplayMode(SecondsDisplayMode mode) override
+    {
+        if (SecondsDisplayMode::SECOND_DISP_OFF != mode)
+        {
+            LOG_WARNING("Illegal DateTime seconds view mode for 32X8: (%hhu)", mode);
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * @brief Update current time values in view.
      * 
      * @param[in] now current time
