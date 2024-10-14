@@ -72,7 +72,7 @@
                 </ul>
                 <h2>Configuration</h2>
                 <h3>Display</h3>
-                <div class="h-100 p-5 bg-body-tertiary border rounded-3">
+                <div class="h-100 p-1 p-md-5 bg-body-tertiary border rounded-3">
                     <form id="myForm" action="javascript:setConfig(pluginUid.options[pluginUid.selectedIndex].value)">
                         <div class="form-group">
                             <label class="form-label" for="pluginUid">Plugin UID:</label>
@@ -119,18 +119,50 @@
                             <label class="form-label" for="timeFormat">Color of other days:</label>
                             <input class="form-control" type="text" id="dayOffColor" name="dayOffColor" value="" />    
                         </div>
-                         <div class="container-fluid">
-                            <h1>Norbert</h1>
-                            <div class="form-group">
-                            <label class="form-label" for="viewMode">View mode:</label>
-                            <select class="form-select" id="viewMode">
-                                <option value="0">Digital</option>
-                                <option value="1">Analog</option>
-                                <option value="2">Both</option>
-                            </select>    
+                            <div class="container-fluid mt-3 p-0" id="options64x64" style="Display:none">
+                                <label class="form-label">Additional Options for 64x64 Layouts:</label>
+                                <div class="row mt-2 align-content-center">
+                                    <div class="col-12 col-sm-3 pb-2 pb-sm-0">
+                                        <label class="align-middle" for="viewMode">Clock View Mode:</label>
+                                    </div>
+                                    <div class="col-12 col-sm-9">
+                                        <div class="btn-group" role="group">
+                                            <input type="radio" class="btn-check" id="viewMode0" name="viewMode" value="0" checked>
+                                            <label class="btn btn-outline-secondary" for="viewMode0">Digital</label>
+    
+    
+                                            <input type="radio" class="btn-check" id="viewMode1" name="viewMode" value="1" checked>
+                                            <label class="btn btn-outline-secondary" for="viewMode1">Analog</label>
+    
+                                            <input type="radio" class="btn-check" id="viewMode2" name="viewMode" value="2" checked>
+                                            <label class="btn btn-outline-secondary" for="viewMode2">Both</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-12 col-sm-3 pb-2 pb-sm-0">
+                                        <label class="align-middle" for="secondsMode">Analog Seconds Visualisation:</label>
+                                    </div>
+                                    <div class="col-12 col-sm-9">
+                                        <div class="btn-group" role="group">
+                                            <input type="radio" class="btn-check" id="secondsMode0" name="secondsMode" value="0" checked>
+                                            <label class="btn btn-outline-secondary" for="secondsMode0">Off</label>
+    
+    
+                                            <input type="radio" class="btn-check" id="secondsMode1" name="secondsMode" value="1" checked>
+                                            <label class="btn btn-outline-secondary" for="secondsMode1">Clock Hand</label>
+    
+                                            <input type="radio" class="btn-check" id="secondsMode2" name="secondsMode" value="2" checked>
+                                            <label class="btn btn-outline-secondary" for="secondsMode2">Dial Dots</label>
+                                            
+                                            <input type="radio" class="btn-check" id="secondsMode3" name="secondsMode" value="3" checked>
+                                            <label class="btn btn-outline-secondary" for="secondsMode3">Dial and Hand</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        </div> 
-                        <input name="submit" type="submit" value="Update"/>
+                        <input class="btn btn-secondary mt-3" name="submit" type="submit" value="Update"/>
                     </form>
                 </div>
             </div>
@@ -243,7 +275,8 @@
                         startOfWeek: $("#startOfWeek").val(),
                         dayOnColor: $("#dayOnColor").val(),
                         dayOffColor: $("#dayOffColor").val(),
-                        viewMode: $("#viewMode").val()
+                        viewMode: $('input[name=viewMode]:checked').val(),
+                        secondsMode: $('input[name=secondsMode]:checked').val()
                     }
                 }).then(function(rsp) {
                     alert("Ok.");
@@ -262,6 +295,15 @@
 
                 /* Disable all forms, until the plugin instances are loaded. */
                 disableUI();
+
+                let displayWidth = ~DISPLAY_HEIGHT~;
+                let displayHeight = ~DISPLAY_HEIGHT~;
+
+                /* Enable extended options for screens >= 64x64. */
+                if ((displayWidth >= 64) && (displayHeight >= 64)) {
+                    let opt64x64 = document.getElementById("options64x64");
+                    opt64x64.style.display  = "block";
+                }
 
                 /* Load all plugin instances. */
                 getPluginInstances().then(function(cnt) {
