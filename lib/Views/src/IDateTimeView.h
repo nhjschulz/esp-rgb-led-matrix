@@ -93,6 +93,26 @@ public:
         SECONDS_DISP_MAX       /**< Number of configurations. */
     };
 
+    /** 
+     * Color array indexes for the analog clock drawing.
+     */
+    enum AnalogClockColor
+    {
+        ANA_CLK_COL_HAND_HOUR = 0U, /**< Hour clock hand color. */
+        ANA_CLK_COL_HAND_MIN,       /**< Minutes clock hand color. */
+        ANA_CLK_COL_HAND_SEC,       /**< Seconds colock hand color */
+        ANA_CLK_COL_RING_MIN5_MARK, /**< Ring five minute marks color. */
+        ANA_CLK_COL_RING_MIN_DOT,   /**< Ring minut dots color. */
+        ANA_CLK_COL_MAX             /**< Number of colors. */
+    };
+
+    /** Analog clock appearance configuration. */
+    struct AnalogClockConfig
+    {
+        SecondsDisplayMode m_secondsMode;              /**< Seconds visualisation mode. */
+        Color              m_colors[ANA_CLK_COL_MAX];  /**< Clock colors to use.        */
+    };
+
     /**
      * Initialize view, which will prepare the widgets and the default values.
      */
@@ -199,23 +219,25 @@ public:
     virtual bool setViewMode(ViewMode mode) = 0;
 
     /**
-     * Get the analog clock seconds display mode (none, ring, hand or both).
+     * Get the analog clock clonfiguration.
      * 
-     * @return SecondsDisplayMode 
+     * @return AnalogClockConfig or nullptr if unsupported.
      */
-    virtual SecondsDisplayMode getSecondsDisplayMode() const = 0;
+    virtual const AnalogClockConfig* getAnalogClockConfig() const = 0;
 
     /**
-     * Set the analog clock seconds display mode (none, ring, hand or both).
+     * Set the analog clock configuration.
+     * 
+     * @param[in] cfg The new configuration to apply.
      * 
      * @return success or failure
      */
-    virtual bool setSecondsDisplayMode(SecondsDisplayMode mode) = 0;
+    virtual bool setAnalogClockConfig(const AnalogClockConfig& cfg) = 0;
 
     /**
      * @brief Update current time values in view.
      * 
-     * @param now current time
+     * @param[in] now current time
      */
     virtual void setCurrentTime(const tm& now) = 0;
 

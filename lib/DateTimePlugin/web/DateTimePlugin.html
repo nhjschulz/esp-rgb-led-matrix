@@ -185,10 +185,10 @@
                                     <div class="col-12 col-sm-9">
                                         <div class="btn-group" role="group">
                                             <div class="form-group">
-                                                <input type="color" class="form-control form-control-color" id="ringfiveMinCol" value="#0000FF" title="Five Minute Mark Color">
+                                                <input type="color" class="form-control form-control-color" id="ringFiveMinCol" value="#0000FF" title="Five Minute Mark Color">
                                             </div>
                                             <div class="form-group">
-                                                <input type="color" class="form-control form-control-color" id="ringMinDotnCol" value="#A9A9A9" title="Minute Ring Dot Colorr">
+                                                <input type="color" class="form-control form-control-color" id="ringMinDotCol" value="#A9A9A9" title="Minute Ring Dot Colorr">
                                             </div>
                                         </div>
                                     </div>
@@ -273,6 +273,7 @@
 
             function getConfig(pluginUid) {
                 disableUI();
+                
                 return utils.makeRequest({
                     method: "GET",
                     url: "/rest/api/v1/display/uid/" + pluginUid + "/dateTime",
@@ -287,6 +288,15 @@
                     $("#dayOffColor").val(rsp.data.dayOffColor);
                     $("#viewMode").val(rsp.data.viewMode);
 
+                    if (rsp.data.hasOwnProperty("analogClock")) {
+                        jsonAnalogClock = rsp.data.analogClock;
+                        $("#handHourCol").val(jsonAnalogClock.handHourCol);
+                        $("#handMinCol").val(jsonAnalogClock.handMinCol);
+                        $("#handSecCol").val(jsonAnalogClock.handSecCol);
+                        $("#ringFiveMinCol").val(jsonAnalogClock.ringFiveMinCol);
+                        $("#ringMinDotCol").val(jsonAnalogClock.ringMinDotCol);
+                    }
+
                 }).catch(function(rsp) {
                     alert("Internal error.");
                 }).finally(function() {
@@ -296,11 +306,11 @@
 
             function setConfig(pluginUid) {
                 disableUI();
-                return utils.makeRequest({
-                    method: "POST",
-                    url: "/rest/api/v1/display/uid/" + pluginUid + "/dateTime",
-                    isJsonResponse: true,
-                    parameter: {
+
+                let displayWidth = ~DISPLAY_HEIGHT~;
+                let displayHeight = ~DISPLAY_HEIGHT~;
+
+                configJson = {
                         mode: $("#mode").val(),
                         timeFormat: $("#timeFormat").val(),
                         dateFormat: $("#dateFormat").val(),
@@ -308,9 +318,29 @@
                         startOfWeek: $("#startOfWeek").val(),
                         dayOnColor: $("#dayOnColor").val(),
                         dayOffColor: $("#dayOffColor").val(),
-                        viewMode: $('input[name=viewMode]:checked').val(),
-                        secondsMode: $('input[name=secondsMode]:checked').val()
-                    }
+                        handHourCol: $("#handHourCol").val(),
+                        viewMode: $('input[name=viewMode]:checked').val()
+
+                    };
+
+                if ((64 <= ~DISPLAY_HEIGHT~) && (64 <= ~DISPLAY_WIDTH~))
+                {
+                    configJson["analogClock"] = 
+                        {
+                            secondsMode: $('input[name=secondsMode]:checked').val(),
+                            handHourCol: $("#handHourCol").val(),
+                            handMinCol: $("#handMinCol").val(),
+                            handSecCol: $("#handSecCol").val(),
+                            ringFiveMinCol: $("#ringFiveMinCol").val(),
+                            ringMinDotCol: $("#ringMinDotCol").val()
+                        };
+                }
+
+                return utils.makeRequest({
+                    method: "POST",
+                    url: "/rest/api/v1/display/uid/" + pluginUid + "/dateTime",
+                    isJsonResponse: true,
+                    parameter: configJson
                 }).then(function(rsp) {
                     alert("Ok.");
                 }).catch(function(rsp) {
@@ -329,7 +359,7 @@
                 /* Disable all forms, until the plugin instances are loaded. */
                 disableUI();
 
-                let displayWidth = ~DISPLAY_HEIGHT~;
+                let displayWidth = ~DISPLAY_WIDTH~;
                 let displayHeight = ~DISPLAY_HEIGHT~;
 
                 /* Enable extended options for screens >= 64x64. */

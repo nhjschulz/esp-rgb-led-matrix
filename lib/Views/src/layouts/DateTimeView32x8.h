@@ -277,11 +277,11 @@ public:
     /**
      * Get the analog clock seconds display mode (none, ring, hand or both).
      * 
-     * @return SecondsDisplayMode 
+     * @return SecondsDisplayMode pointer or nullptr if unsupported. 
      */
-    virtual SecondsDisplayMode getSecondsDisplayMode() const override
+    virtual const AnalogClockConfig* getAnalogClockConfig() const override
     {
-        return SecondsDisplayMode::SECOND_DISP_OFF; /* 32X8 layout can only do digital.*/
+        return nullptr; /* 32X8 layout can only do digital.*/
     }
 
     /**
@@ -289,14 +289,9 @@ public:
      * 
      * @return success of failure
      */
-    virtual bool setSecondsDisplayMode(SecondsDisplayMode mode) override
+    virtual bool setAnalogClockConfig(const AnalogClockConfig& cfg) override
     {
-        if (SecondsDisplayMode::SECOND_DISP_OFF != mode)
-        {
-            LOG_WARNING("Illegal DateTime seconds view mode for 32X8: (%hhu)", mode);
-            return false;
-        }
-        return true;
+        return true;  /* No analog clock in 32x8 layout, ignore request. */
     }
 
     /**

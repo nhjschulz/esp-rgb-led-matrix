@@ -71,7 +71,17 @@ public:
     DateTimeView64x64() :
         DateTimeViewGeneric(),
         m_mode(ViewMode::DIGITAL_AND_ANALOG),
-        m_secondsDisplayMode(SECOND_DISP_RING),
+        m_analogClockCfg( 
+            { 
+                SECOND_DISP_RING,
+                {
+                    ColorDef::WHITE,
+                    ColorDef::GRAY,
+                    ColorDef::YELLOW,
+                    ColorDef::BLUE,
+                    ColorDef::YELLOW
+                } 
+            }),
         m_lastUpdateSecondVal(-1)
     {
         /* Disable fade effect in case the user required to show seconds,
@@ -119,50 +129,51 @@ public:
      */
     bool setViewMode(ViewMode mode) override
     {
+        bool ret = false;
+
         if (ViewMode::VIEW_MODE_MAX <= mode)
         {
             LOG_WARNING("Illegal DateTime view mode (%hhu)", mode);
-            return false;
+        }
+        else
+        {
+            m_mode = mode;
+            ret    = true;
         }
 
-        LOG_WARNING("new view mode (%hhu)", mode);
-
-        m_mode = mode;
         return true;
     }
 
     /**
-     * Get the analog clock seconds display mode (none, ring, hand or both).
+     * Get the analog clock configuration.
      * 
      * @return SecondsDisplayMode 
      */
-    SecondsDisplayMode getSecondsDisplayMode() const override
+    const AnalogClockConfig* getAnalogClockConfig() const override
     {
-        return m_secondsDisplayMode;
+        return &m_analogClockCfg;
     }
 
     /**
-     * Set the analog clock seconds display mode (none, ring, hand or both).
+     * Set the analog clock configuration.
      * 
      * @return success of failure
      */
-    bool setSecondsDisplayMode(SecondsDisplayMode mode) override
+    bool setAnalogClockConfig(const AnalogClockConfig& cfg) override
     {
-        if (SecondsDisplayMode::SECONDS_DISP_MAX <= mode)
+        if (SecondsDisplayMode::SECONDS_DISP_MAX <= cfg.m_secondsMode)
         {
-            LOG_WARNING("Illegal Seconds Display mode (%hhu)", mode);
+            LOG_WARNING("Illegal Seconds Display mode (%hhu)", cfg.m_secondsMode);
             return false;
         }
 
-        LOG_WARNING("new view mode (%hhu)", mode);
-
-        m_secondsDisplayMode = mode;
+        m_analogClockCfg = cfg;
         return true;
     }
 protected:
 
     ViewMode           m_mode;               /**< Used View mode analog, digital or both.  */
-    SecondsDisplayMode m_secondsDisplayMode; /**< How to visualize seconds in analog clock. */
+    AnalogClockConfig  m_analogClockCfg;     /**< The clock drawing configuration options. */
 
 
     /**

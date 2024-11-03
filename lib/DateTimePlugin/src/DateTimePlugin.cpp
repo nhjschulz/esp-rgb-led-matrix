@@ -59,13 +59,23 @@
  *****************************************************************************/
 
 /* Initialize plugin topic. */
-const char* DateTimePlugin::TOPIC_CONFIG        = "/dateTime";
+const char DateTimePlugin::TOPIC_CONFIG[]        = "/dateTime";
 
 /* Initialize default time format. */
-const char* DateTimePlugin::TIME_FORMAT_DEFAULT = "%I:%M %p";
+const char DateTimePlugin::TIME_FORMAT_DEFAULT[] = "%I:%M %p";
 
 /* Initialize default date format. */
-const char* DateTimePlugin::DATE_FORMAT_DEFAULT = "%m/%d";
+const char DateTimePlugin::DATE_FORMAT_DEFAULT[] = "%m/%d";
+
+/* Color key names for the analog clock configuration. */
+const char* DateTimePlugin::ANALOG_CLOCK_COLOR_KEYS[IDateTimeView::ANA_CLK_COL_MAX] =
+{
+    "handHourCol",
+    "handMinCol",
+    "handSecCol",
+    "ringFiveMinCol",
+    "ringMinDotCol"
+};
 
 /******************************************************************************
  * Public Methods
@@ -95,20 +105,22 @@ bool DateTimePlugin::setTopic(const String& topic, const JsonObjectConst& value)
 
     if (true == topic.equals(TOPIC_CONFIG))
     {
-        const size_t        JSON_DOC_SIZE           = 512U;
+        const IDateTimeView::AnalogClockConfig* analogClockCfg = nullptr;
+
+        const size_t        JSON_DOC_SIZE           = 768U;
         DynamicJsonDocument jsonDoc(JSON_DOC_SIZE);
         JsonObject          jsonCfg                 = jsonDoc.to<JsonObject>();
         JsonVariantConst    jsonMode                = value["mode"];
         JsonVariantConst    jsonViewMode            = value["viewMode"];
-        JsonVariantConst    jsonSecondsMode         = value["secondsMode"];
         JsonVariantConst    jsonTimeFormat          = value["timeFormat"];
         JsonVariantConst    jsonDateFormat          = value["dateFormat"];
         JsonVariantConst    jsonTimeZone            = value["timeZone"];
         JsonVariantConst    jsonStartOfWeek         = value["startOfWeek"];
         JsonVariantConst    jsonDayOnColor          = value["dayOnColor"];
         JsonVariantConst    jsonDayOffColor         = value["dayOffColor"];
-
-        /* The received configuration may not contain all single key/value pair.
+        JsonObjectConst     jsonAnalogClock         = value["analogClock"];
+       
+         /* The received configuration may not contain all single key/value pair.
          * Therefore read first the complete internal configuration and
          * overwrite them with the received ones.
          */
@@ -131,12 +143,6 @@ bool DateTimePlugin::setTopic(const String& topic, const JsonObjectConst& value)
             isSuccessful = true;
         }
 
-        if (false == jsonSecondsMode.isNull())
-        {
-            jsonCfg["secondsMode"] = jsonSecondsMode.as<uint8_t>();
-            isSuccessful = true;
-        }
-        
         if (false == jsonTimeFormat.isNull())
         {
             jsonCfg["timeFormat"] = jsonTimeFormat.as<String>();
@@ -170,6 +176,12 @@ bool DateTimePlugin::setTopic(const String& topic, const JsonObjectConst& value)
         if (false == jsonDayOffColor.isNull())
         {
             jsonCfg["dayOffColor"] = jsonDayOffColor.as<String>();
+            isSuccessful = true;
+        }
+        
+        if (false == jsonAnalogClock.isNull())
+        {
+            jsonCfg["analogClock"] = jsonAnalogClock;
             isSuccessful = true;
         }
 
@@ -276,6 +288,8 @@ void DateTimePlugin::update(YAGfx& gfx)
 
 void DateTimePlugin::getConfiguration(JsonObject& jsonCfg) const
 {
+    const IDateTimeView::AnalogClockConfig* analogClockCfg = nullptr;
+
     MutexGuard<MutexRecursive> guard(m_mutex);
 
     jsonCfg["mode"]         = m_mode;
@@ -286,6 +300,19 @@ void DateTimePlugin::getConfiguration(JsonObject& jsonCfg) const
     jsonCfg["startOfWeek"]  = m_view.getStartOfWeek();
     jsonCfg["dayOnColor"]   = colorToHtml(m_view.getDayOnColor());
     jsonCfg["dayOffColor"]  = colorToHtml(m_view.getDayOffColor());
+
+    if (nullptr != (analogClockCfg = m_view.getAnalogClockConfig()))
+    {
+        /* View supports analog clock, add the additinal config elements for it.
+         */
+        JsonObject jsonAnalogClock = jsonCfg.createNestedObject("analogClock");
+        jsonAnalogClock["secondsMode"] = analogClockCfg->m_secondsMode;
+        for (uint32_t index = 0U;  index < IDateTimeView::ANA_CLK_COL_MAX; ++index)
+        {
+            jsonAnalogClock[ANALOG_CLOCK_COLOR_KEYS[index]]= colorToHtml(analogClockCfg->m_colors[index]);
+        }
+    }
+
 }
 
 bool DateTimePlugin::setConfiguration(const JsonObjectConst& jsonCfg)
@@ -293,15 +320,15 @@ bool DateTimePlugin::setConfiguration(const JsonObjectConst& jsonCfg)
     bool             status             = false;
     JsonVariantConst jsonMode           = jsonCfg["mode"];
     JsonVariantConst jsonViewMode       = jsonCfg["viewMode"];
-    JsonVariantConst jsonSecondsMode    = jsonCfg["secondsMode"];
     JsonVariantConst jsonTimeFormat     = jsonCfg["timeFormat"];
     JsonVariantConst jsonDateFormat     = jsonCfg["dateFormat"];
     JsonVariantConst jsonTimeZone       = jsonCfg["timeZone"];
     JsonVariantConst jsonStartOfWeek    = jsonCfg["startOfWeek"];
     JsonVariantConst jsonDayOnColor     = jsonCfg["dayOnColor"];
     JsonVariantConst jsonDayOffColor    = jsonCfg["dayOffColor"];
+    JsonVariantConst jsonAnalogClock    = jsonCfg["analogClock"];
 
-LOG_WARNING("JSON view mode %d", jsonMode.as<uint8_t>());
+    IDateTimeView::AnalogClockConfig analogClockConfig;
 
     if ((false == jsonMode.is<uint8_t>()) &&
         (MODE_MAX <= jsonMode.as<uint8_t>()))
@@ -312,11 +339,6 @@ LOG_WARNING("JSON view mode %d", jsonMode.as<uint8_t>());
         (IDateTimeView::VIEW_MODE_MAX <= jsonViewMode.as<uint8_t>()))
     {
         LOG_WARNING("JSON view mode not found or invalid type.");
-    }
-    else if ((false == jsonSecondsMode.is<uint8_t>()) &&
-        (IDateTimeView::SECONDS_DISP_MAX <= jsonSecondsMode.as<uint8_t>()))
-    {
-        LOG_WARNING("JSON seconds mode not found or invalid type.");
     }
     else if (false == jsonTimeFormat.is<String>())
     {
@@ -342,6 +364,9 @@ LOG_WARNING("JSON view mode %d", jsonMode.as<uint8_t>());
     {
         LOG_WARNING("JSON day off color not found or invalid type.");
     }
+    else if (false == checkAnalogClockConfig(jsonAnalogClock, analogClockConfig))
+        /* Error printed in checkAnalogClockConfig() already. */
+        ;
     else
     {
         MutexGuard<MutexRecursive> guard(m_mutex);
@@ -355,7 +380,12 @@ LOG_WARNING("JSON view mode %d", jsonMode.as<uint8_t>());
         m_view.setDayOnColor(colorFromHtml(jsonDayOnColor.as<String>()));
         m_view.setDayOffColor(colorFromHtml(jsonDayOffColor.as<String>()));
         m_view.setViewMode(static_cast<IDateTimeView::ViewMode>(jsonViewMode.as<uint8_t>()));
-        m_view.setSecondsDisplayMode(static_cast<IDateTimeView::SecondsDisplayMode>(jsonSecondsMode.as<uint8_t>()));
+
+        if (false == jsonAnalogClock.isNull())
+        {
+            m_view.setAnalogClockConfig(analogClockConfig);
+        }
+
         m_hasTopicChanged = true;
     }
 
@@ -541,7 +571,7 @@ bool DateTimePlugin::getTimeAsString(String& time, const String& format, const t
     return isSuccessful;
 }
 
-String DateTimePlugin::colorToHtml(const Color& color) const
+String DateTimePlugin::colorToHtml(const Color& color)
 {
     char buffer[8]; /* '#' + 3x byte in hex + '\0' */
 
@@ -550,7 +580,7 @@ String DateTimePlugin::colorToHtml(const Color& color) const
     return String(buffer);
 }
 
-Color DateTimePlugin::colorFromHtml(const String& htmlColor) const
+Color DateTimePlugin::colorFromHtml(const String& htmlColor)
 {
     Color color;
 
@@ -560,6 +590,46 @@ Color DateTimePlugin::colorFromHtml(const String& htmlColor) const
     }
 
     return color;
+}
+
+bool DateTimePlugin::checkAnalogClockConfig(JsonVariantConst& jsonCfg, IDateTimeView::AnalogClockConfig & cfg)
+{
+    bool result = true;
+
+    if (false == jsonCfg.isNull())
+    {
+        JsonVariantConst jsonSecondsMode = jsonCfg["secondsMode"];
+
+        if ((false == jsonSecondsMode.is<uint8_t>()) &&
+            (IDateTimeView::SECONDS_DISP_MAX <= jsonSecondsMode.as<uint8_t>()))
+        {
+            LOG_WARNING("JSON seconds mode not found or invalid type.");
+            result = false;
+        } 
+        else
+        {
+            cfg.m_secondsMode = static_cast<IDateTimeView::SecondsDisplayMode>(jsonSecondsMode.as<uint8_t>());
+
+            for (uint32_t idx = 0U; idx < IDateTimeView::ANA_CLK_COL_MAX; ++ idx)
+            {
+                JsonVariantConst color = jsonCfg[ANALOG_CLOCK_COLOR_KEYS[idx]];
+
+                if (false == color.is<String>())
+                {
+                    LOG_WARNING(
+                        "JSON attribute %s not found or invalid type.",
+                        ANALOG_CLOCK_COLOR_KEYS[idx]);
+                    result = false;
+                }
+                else
+                {
+                    cfg.m_colors[idx] = colorFromHtml(color);
+                }
+            }
+        }
+    }
+
+    return result;
 }
 
 /******************************************************************************
